@@ -1,8 +1,20 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/authContext";
+import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/rooms");
+    }
+  }, [user, loading, router]);
+
+  if (!loading && user) return null;
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-green-800 to-yellow-400 text-center px-4 py-8 animate-fade-in">
       <div className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl flex flex-col items-center gap-8">

@@ -24,7 +24,7 @@ export default function AuthPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) setError(error.message);
-    else router.push("/");
+    else router.push("/rooms");
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
