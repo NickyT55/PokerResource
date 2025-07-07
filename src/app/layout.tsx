@@ -91,19 +91,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+  // List of public routes
+  const publicRoutes = ["/", "/auth"];
+  const isPublic = publicRoutes.includes(pathname);
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <AuthProvider>
-          <AuthGuard>
-            <ThemeToggle />
-            <FullscreenToggle />
-            <SidebarWrapper>
-              <main className="flex-1 p-6">{children}</main>
-            </SidebarWrapper>
-          </AuthGuard>
+          <ThemeToggle />
+          <FullscreenToggle />
+          {isPublic ? (
+            <main className="flex-1 p-0">{children}</main>
+          ) : (
+            <AuthGuard>
+              <SidebarWrapper>
+                <main className="flex-1 p-6">{children}</main>
+              </SidebarWrapper>
+            </AuthGuard>
+          )}
         </AuthProvider>
       </body>
     </html>
