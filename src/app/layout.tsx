@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
+import Sidebar, { BottomNav } from "@/components/Sidebar";
 import React, { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "@/lib/authContext";
 import { usePathname, useRouter } from "next/navigation";
@@ -135,7 +135,7 @@ function SidebarWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       {user && <Sidebar />}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative pt-4 pb-16 sm:pb-0">
         {needsProfile && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
             <form onSubmit={handleSave} className="bg-card border border-border rounded-xl p-8 flex flex-col gap-4 w-full max-w-xs">
@@ -167,6 +167,7 @@ function SidebarWrapper({ children }: { children: React.ReactNode }) {
           </div>
         )}
         {children}
+        <BottomNav />
       </div>
     </div>
   );
