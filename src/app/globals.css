@@ -120,3 +120,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 1.2s ease-in;
+  }
+  .animate-bounce-slow {
+    animation: bounce 2.5s infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
