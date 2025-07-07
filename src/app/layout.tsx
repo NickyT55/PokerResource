@@ -91,7 +91,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+  const pathname = usePathname();
   // List of public routes
   const publicRoutes = ["/", "/auth"];
   const isPublic = publicRoutes.includes(pathname);
