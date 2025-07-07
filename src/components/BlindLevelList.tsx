@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { useTournamentStore } from "@/store/tournament";
 import { v4 as uuidv4 } from "uuid";
