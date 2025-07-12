@@ -10,9 +10,13 @@ const BlindLevelList = () => {
 
   const [editMode, setEditMode] = useState(false);
   const [editedLevels, setEditedLevels] = useState(() => blindLevels.map(l => ({ ...l })));
+  const isSavingRef = React.useRef(false);
 
   // Sync editedLevels with store if blinds change externally
   React.useEffect(() => {
+    // Don't sync if we're currently saving (prevents infinite loop)
+    if (isSavingRef.current) return;
+    
     setEditedLevels(blindLevels.map(l => ({ ...l })));
   }, [blindLevels]);
 
@@ -23,9 +27,14 @@ const BlindLevelList = () => {
   };
 
   const handleSave = () => {
+    isSavingRef.current = true;
     // Ensure ante matches big blind
     setBlindLevels(editedLevels.map(l => ({ ...l, bigBlind: l.bigBlind })));
     setEditMode(false);
+    // Reset saving flag after a short delay to allow the store update to complete
+    setTimeout(() => {
+      isSavingRef.current = false;
+    }, 100);
   };
 
   const handleAddLevel = () => {
