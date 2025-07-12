@@ -72,7 +72,6 @@ export default function TournamentDashboard({
             timeLeft={clock.timeLeft}
             currentLevel={currentLevel}
             blindLevels={blindLevels}
-            breakLevels={session?.settings?.breakLevels || []}
           />
         </div>
         {blindLevels[currentLevel] && (

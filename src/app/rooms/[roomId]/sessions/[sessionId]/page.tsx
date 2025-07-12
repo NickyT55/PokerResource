@@ -7,6 +7,7 @@ import TournamentDashboard from "@/components/TournamentDashboard";
 import Clock from "@/components/Clock";
 import PayoutTable from "@/components/PayoutTable";
 import BlindLevelList from "@/components/BlindLevelList";
+import { useTournamentStore } from "@/store/tournament";
 
 const DEFAULT_LEVELS = [
   { smallBlind: 25, bigBlind: 50, duration: 900 },
@@ -94,8 +95,11 @@ export default function SessionDashboard() {
   // Tournament state
   const [clock, setClock] = useState({ running: false, timeLeft: 900 });
   const [currentLevel, setCurrentLevel] = useState(0);
-  const [blindLevels, setBlindLevels] = useState(DEFAULT_LEVELS);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Use Zustand store for blind levels
+  const blindLevels = useTournamentStore((s) => s.blindLevels);
+  const setBlindLevels = useTournamentStore((s) => s.setBlindLevels);
   // Cash game state
   const [ending, setEnding] = useState(false);
   const [ended, setEnded] = useState(false);
@@ -195,7 +199,9 @@ export default function SessionDashboard() {
             : data.tournament_state;
           setClock(state.clock);
           setCurrentLevel(state.currentLevel);
-          setBlindLevels(state.blindLevels);
+          if (state.blindLevels) {
+            setBlindLevels(state.blindLevels);
+          }
         }
       });
   }, [sessionId, user?.id, roomId]);
@@ -358,31 +364,25 @@ export default function SessionDashboard() {
   useEffect(() => {
     if (session && session.settings) {
       console.log('[Settings Effect] Session settings updated:', session.settings);
-      let updatedBlindLevels = blindLevels;
       
       if (session.settings.blindLevels) {
         console.log('[Settings Effect] Updating blind levels from settings:', session.settings.blindLevels);
-        updatedBlindLevels = session.settings.blindLevels;
         setBlindLevels(session.settings.blindLevels);
       }
       
-      if (session.settings.defaultBlindDuration && updatedBlindLevels.length > 0) {
+      if (session.settings.defaultBlindDuration && blindLevels.length > 0) {
         console.log('[Settings Effect] Updating durations to:', session.settings.defaultBlindDuration);
-        const newBlindLevels = updatedBlindLevels.map((l: any) => ({ ...l, duration: session.settings.defaultBlindDuration }));
+        const newBlindLevels = blindLevels.map((l: any) => ({ ...l, duration: session.settings.defaultBlindDuration }));
         setBlindLevels(newBlindLevels);
-        updatedBlindLevels = newBlindLevels;
       }
-      
-
       
       // Update tournament state in database with new blind levels (admin only)
-      if (admin && updatedBlindLevels !== blindLevels) {
+      if (admin) {
         console.log('[Settings Effect] Updating tournament state with new blind levels');
-        const newState = { clock, currentLevel, blindLevels: updatedBlindLevels };
-        updateTournamentState(clock, currentLevel, updatedBlindLevels);
+        updateTournamentState(clock, currentLevel, blindLevels);
       }
     }
-  }, [session]);
+  }, [session, blindLevels]);
 
   // Clock control handlers: always update tournament_state in DB (admin only)
   const updateTournamentState = async (newClock: any, newCurrentLevel: number, newBlindLevels: any[]) => {
