@@ -101,16 +101,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <AuthProvider>
-          <ThemeToggle />
-          <FullscreenToggle />
+            <ThemeToggle />
+            <FullscreenToggle />
           {isPublic ? (
             <main className="flex-1 p-0">{children}</main>
           ) : (
             <AuthGuard>
-              <SidebarWrapper>
-                <main className="flex-1 p-6">{children}</main>
-              </SidebarWrapper>
-            </AuthGuard>
+            <SidebarWrapper>
+              <main className="flex-1 p-6">{children}</main>
+            </SidebarWrapper>
+          </AuthGuard>
           )}
         </AuthProvider>
       </body>

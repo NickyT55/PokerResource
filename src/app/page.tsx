@@ -9,7 +9,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace("/rooms");
+    router.replace("/rooms");
     }
   }, [user, loading, router]);
 

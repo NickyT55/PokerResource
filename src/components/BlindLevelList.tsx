@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 const BlindLevelList = () => {
   const blindLevels = useTournamentStore((s) => s.blindLevels);
   const setBlindLevels = useTournamentStore((s) => s.setBlindLevels);
-  const breakLevels = useTournamentStore((s) => s.settings.breakLevels);
 
   const [editMode, setEditMode] = useState(false);
   const [editedLevels, setEditedLevels] = useState(() => blindLevels.map(l => ({ ...l })));
@@ -89,7 +88,7 @@ const BlindLevelList = () => {
             <th className="py-2">Big Blind</th>
             <th className="py-2">Ante</th>
             <th className="py-2">Duration (min)</th>
-            <th className="py-2">Break?</th>
+
             {editMode && <th className="py-2">Actions</th>}
           </tr>
         </thead>
@@ -139,7 +138,7 @@ const BlindLevelList = () => {
                   level.duration / 60
                 )}
               </td>
-              <td>{breakLevels.includes(i + 1) ? <span className="text-yellow-400 font-bold">Break</span> : ""}</td>
+                
               {editMode && (
                 <td className="flex gap-2 justify-center items-center py-1">
                   <button

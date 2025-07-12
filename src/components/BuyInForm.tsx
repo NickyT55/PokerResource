@@ -17,6 +17,8 @@ const BuyInForm = () => {
   const [name, setName] = useState("");
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [noteValue, setNoteValue] = useState("");
+  const [editingBuyIns, setEditingBuyIns] = useState<string | null>(null);
+  const [buyInsValue, setBuyInsValue] = useState(1);
 
   const handleAddPlayer = () => {
     if (name.trim()) {
@@ -98,7 +100,50 @@ const BuyInForm = () => {
           {players.map((player) => (
             <tr key={player.id} className="border-b border-red-900/40">
               <td className="py-1 text-red-300 font-bold">{player.name}</td>
-              <td>{player.buyIns}</td>
+              <td>
+                {editingBuyIns === player.id ? (
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="number"
+                      min="1"
+                      className="rounded bg-neutral-800 text-white border border-neutral-700 px-2 py-1 w-16"
+                      value={buyInsValue}
+                      onChange={e => setBuyInsValue(Number(e.target.value))}
+                      autoFocus
+                    />
+                    <button
+                      className="bg-green-700 hover:bg-green-800 text-white rounded px-2 py-1 text-xs"
+                      onClick={() => {
+                        setPlayers(players.map(p => p.id === player.id ? { ...p, buyIns: buyInsValue } : p));
+                        setEditingBuyIns(null);
+                        recalculatePrizePool();
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="bg-gray-700 hover:bg-gray-800 text-white rounded px-2 py-1 text-xs"
+                      onClick={() => setEditingBuyIns(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    {player.buyIns}
+                    <button
+                      className="bg-neutral-700 hover:bg-neutral-800 text-white rounded px-2 py-1 text-xs ml-2"
+                      onClick={() => {
+                        setEditingBuyIns(player.id);
+                        setBuyInsValue(player.buyIns);
+                      }}
+                      title="Edit Buy-Ins"
+                    >
+                      ✎
+                    </button>
+                  </span>
+                )}
+              </td>
               <td>{player.rebuys}</td>
               <td className={player.status === "eliminated" ? "text-gray-400" : "text-green-400 font-bold"}>
                 {player.status === "eliminated" ? "Eliminated" : "Alive"}
@@ -140,6 +185,19 @@ const BuyInForm = () => {
                 )}
               </td>
               <td className="flex gap-2 justify-center items-center py-1">
+                <button
+                  className="bg-blue-900 hover:bg-blue-800 text-white rounded px-2 py-1 text-xs"
+                  onClick={() => {
+                    if (player.buyIns > 1) {
+                      setPlayers(players.map(p => p.id === player.id ? { ...p, buyIns: player.buyIns - 1 } : p));
+                      recalculatePrizePool();
+                    }
+                  }}
+                  title="- Buy-In"
+                  disabled={player.buyIns === 1}
+                >
+                  - Buy-In
+                </button>
                 <button
                   className="bg-green-700 hover:bg-green-800 text-white rounded px-2 py-1 text-xs"
                   onClick={() => handleBuyIn(player.id)}

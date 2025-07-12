@@ -5,16 +5,10 @@ import { useTournamentStore } from "@/store/tournament";
 const SETTINGS_KEY = "tournament_settings";
 const SOUND_KEY = "tournament_sounds";
 
-function parseBreakLevels(input: string): number[] {
-  return input
-    .split(",")
-    .map((v) => parseInt(v.trim(), 10))
-    .filter((n) => !isNaN(n));
-}
+
 
 const defaultSounds = {
   alert: "/sounds/alert.mp3",
-  break: "/sounds/break.mp3",
 };
 
 const SettingsForm = () => {
@@ -29,7 +23,6 @@ const SettingsForm = () => {
   const calculatePayouts = require("@/lib/payouts").calculatePayouts;
 
   const [form, setForm] = useState(settings);
-  const [breakLevelsInput, setBreakLevelsInput] = useState(form.breakLevels.join(","));
   const [tournamentLength, setTournamentLength] = useState(120); // default 2 hours
   const [showConfirm, setShowConfirm] = useState(false);
   const [sounds, setSounds] = useState(() => {
@@ -47,7 +40,6 @@ const SettingsForm = () => {
       try {
         const parsed = JSON.parse(saved);
         setForm(parsed);
-        setBreakLevelsInput(parsed.breakLevels.join(","));
       } catch {}
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,10 +56,7 @@ const SettingsForm = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleBreakLevelsChange = (value: string) => {
-    setBreakLevelsInput(value);
-    setForm((prev) => ({ ...prev, breakLevels: parseBreakLevels(value) }));
-  };
+
 
   // Blind level auto-generation based on desired tournament length
   const handleGenerateBlindLevels = () => {
@@ -110,7 +99,6 @@ const SettingsForm = () => {
   const confirmReset = () => {
     resetTournament();
     setForm(settings);
-    setBreakLevelsInput("");
     setTournamentLength(120);
     setShowConfirm(false);
   };
@@ -140,13 +128,7 @@ const SettingsForm = () => {
           onChange={(e) => e.target.files && handleSoundUpload("alert", e.target.files[0])}
         />
         <audio controls src={sounds.alert} className="mt-1" />
-        <label className="text-red-200 font-semibold mt-4">Break Start Sound</label>
-        <input
-          type="file"
-          accept="audio/*"
-          onChange={(e) => e.target.files && handleSoundUpload("break", e.target.files[0])}
-        />
-        <audio controls src={sounds.break} className="mt-1" />
+
       </div>
       <div className="flex flex-col gap-2">
         <label className="text-red-200 font-semibold">Default Blind Length (minutes)</label>
@@ -189,15 +171,7 @@ const SettingsForm = () => {
           onChange={(e) => handleChange("payoutsCount", Number(e.target.value))}
         />
       </div>
-      <div className="flex flex-col gap-2">
-        <label className="text-red-200 font-semibold">Break Levels (comma separated)</label>
-        <input
-          type="text"
-          className="rounded bg-neutral-800 text-white border border-neutral-700 px-2 py-1"
-          value={breakLevelsInput}
-          onChange={(e) => handleBreakLevelsChange(e.target.value)}
-        />
-      </div>
+
       <div className="flex flex-col gap-2">
         <label className="text-red-200 font-semibold">Desired Tournament Length (minutes)</label>
         <input

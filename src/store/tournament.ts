@@ -6,7 +6,6 @@ const HISTORY_KEY = 'tournament_history';
 
 const defaultSettings: Settings = {
   defaultBlindDuration: 900, // 15 min
-  breakLevels: [],
   startingChips: 10000,
   buyInAmount: 100,
   payoutsCount: 3,

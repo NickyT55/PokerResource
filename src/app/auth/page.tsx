@@ -106,14 +106,14 @@ export default function AuthPage() {
             />
             <label htmlFor="password" className="sr-only">Password</label>
             <div className="relative flex items-center">
-              <input
+            <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+              placeholder="Password"
                 className="rounded px-3 py-2 border border-border bg-background text-foreground w-full focus:outline-none focus:ring-2 focus:ring-primary"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
                 autoComplete="current-password"
                 aria-label="Password"
                 disabled={loading}

@@ -10,7 +10,6 @@ interface SessionSettingsFormProps {
 
 const defaultSettings = {
   defaultBlindDuration: 900,
-  breakLevels: [],
   startingChips: 10000,
   buyInAmount: 100,
   payoutsCount: 3,
@@ -18,7 +17,6 @@ const defaultSettings = {
 
 export default function SessionSettingsForm({ sessionId, initialSettings, isAdmin }: SessionSettingsFormProps) {
   const [form, setForm] = useState<any>(initialSettings || defaultSettings);
-  const [breakLevelsInput, setBreakLevelsInput] = useState((initialSettings?.breakLevels || []).join(","));
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +24,6 @@ export default function SessionSettingsForm({ sessionId, initialSettings, isAdmi
 
   useEffect(() => {
     setForm(initialSettings || defaultSettings);
-    setBreakLevelsInput((initialSettings?.breakLevels || []).join(","));
     if (initialSettings?.tournamentLength) setTournamentLength(initialSettings.tournamentLength);
   }, [initialSettings]);
 
@@ -34,12 +31,7 @@ export default function SessionSettingsForm({ sessionId, initialSettings, isAdmi
     setForm((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const handleBreakLevelsChange = (value: string) => {
-    setBreakLevelsInput(value);
-    setForm((prev: any) => ({ ...prev, breakLevels: value.split(",").map((v: string) => parseInt(v.trim(), 10)).filter((n: number) => !isNaN(n)) }));
-  };
-
-  // Generate blind levels based on tournament length
+  // Blind level auto-generation based on desired tournament length
   const handleGenerateBlindLevels = () => {
     const numLevels = Math.ceil((tournamentLength * 60) / form.defaultBlindDuration);
     let small = 50;
@@ -69,13 +61,23 @@ export default function SessionSettingsForm({ sessionId, initialSettings, isAdmi
     setSaving(true);
     setError(null);
     setSuccess(null);
-    const { error } = await supabase
-      .from("sessions")
-      .update({ settings: form })
-      .eq("id", sessionId);
+
+    try {
+      const { error } = await supabase
+        .from("sessions")
+        .update({ settings: form })
+        .eq("id", sessionId);
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setSuccess("Settings saved successfully!");
+      }
+    } catch (err) {
+      setError("Failed to save settings");
+    }
+
     setSaving(false);
-    if (error) setError(error.message);
-    else setSuccess("Settings saved!");
   };
 
   return (
@@ -127,16 +129,6 @@ export default function SessionSettingsForm({ sessionId, initialSettings, isAdmi
         />
       </div>
       <div className="flex flex-col gap-2">
-        <label className="text-red-200 font-semibold">Break Levels (comma separated)</label>
-        <input
-          type="text"
-          className="rounded bg-neutral-800 text-white border border-neutral-700 px-2 py-1"
-          value={breakLevelsInput}
-          onChange={e => handleBreakLevelsChange(e.target.value)}
-          disabled={!isAdmin}
-        />
-      </div>
-      <div className="flex flex-col gap-2">
         <label className="text-red-200 font-semibold">Desired Tournament Length (minutes)</label>
         <input
           type="number"
@@ -160,8 +152,8 @@ export default function SessionSettingsForm({ sessionId, initialSettings, isAdmi
           {saving ? "Saving..." : "Save Settings"}
         </button>
       )}
-      {success && <div className="text-green-500 font-bold text-center">{success}</div>}
       {error && <div className="text-red-500 font-bold text-center">{error}</div>}
+      {success && <div className="text-green-500 font-bold text-center">{success}</div>}
     </form>
   );
 } 

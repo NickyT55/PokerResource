@@ -16,7 +16,6 @@ export interface BlindLevel {
 
 export interface Settings {
   defaultBlindDuration: number;
-  breakLevels: number[];
   startingChips: number;
   buyInAmount: number;
   payoutsCount: number;
